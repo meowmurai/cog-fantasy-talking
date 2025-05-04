@@ -76,6 +76,16 @@ pip install gradio spaces
 python app.py
 ```
 
+### Deployment
+
+- pip install "huggingface_hub[cli]"
+- huggingface-cli download Wan-AI/Wan2.1-I2V-14B-720P --local-dir ./models/Wan2.1-I2V-14B-720P
+- huggingface-cli download facebook/wav2vec2-base-960h --local-dir ./models/wav2vec2-base-960h
+- huggingface-cli download acvlab/FantasyTalking fantasytalking_model.ckpt --local-dir ./models
+
+- cog predict -i image=@./image.jpg -i audio=@./audio.mp3 -i prompt="a woman talking"
+- cog push r8.im/your-username/your-model-name
+
 ## 🧩 Community Works
 We ❤️ contributions from the open-source community! If your work has improved FantasyTalking, please inform us.
 Or you can directly e-mail [frank.jf@alibaba-inc.com](mailto://frank.jf@alibaba-inc.com). We are happy to reference your project for everyone's convenience.
