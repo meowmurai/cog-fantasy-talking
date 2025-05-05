@@ -1,9 +1,8 @@
 from cog import BasePredictor, Input, Path
-import torch
 import os
 import shutil
 
-from .infer import load_models, main
+from infer import load_models, main
 
 WAN_MODEL_DIR = "./models/Wan2.1-I2V-14B-720P"
 FANTASYTALKING_MODEL_PATH = "./models/fantasytalking_model.ckpt"
@@ -13,18 +12,47 @@ OUTPUT_DIR = "./output"
 INPUT_DIR = "./input"
 
 
+class Arguments:
+    def __init__(
+        self,
+        image=None,
+        audio=None,
+        prompt=None,
+        image_size=None,
+        audio_scale=None,
+        prompt_cfg_scale=None,
+        audio_cfg_scale=None,
+        max_num_frames=None,
+        fps=None,
+        num_persistent_param_in_dit=None,
+        seed=None,
+    ):
+        self.wan_model_dir = WAN_MODEL_DIR
+        self.fantasytalking_model_path = FANTASYTALKING_MODEL_PATH
+        self.wav2vec_model_dir = WAV2VEC_MODEL_DIR
+        self.output_dir = OUTPUT_DIR
+        self.image_path = image
+        self.audio_path = audio
+        self.prompt = prompt
+        self.image_size = image_size
+        self.audio_scale = audio_scale
+        self.prompt_cfg_scale = prompt_cfg_scale
+        self.audio_cfg_scale = audio_cfg_scale
+        self.max_num_frames = max_num_frames
+        self.fps = fps
+        self.num_persistent_param_in_dit = num_persistent_param_in_dit
+        self.seed = seed
+
+
 class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory to make running multiple predictions efficient"""
-        self.model = torch.load("./weights.pth")
-        _pipe, _fantasytalking, _wav2vec_processor, _wav2vec = load_models(
-            {
-                "fantasytalking_model_path": FANTASYTALKING_MODEL_PATH,
-                "wav2vec_model_dir": WAV2VEC_MODEL_DIR,
-                "wan_model_dir": WAN_MODEL_DIR,
-                "num_persistent_param_in_dit": self.num_persistent_param_in_dit,
-            }
+        args = Arguments(
+            num_persistent_param_in_dit=getattr(
+                self, "num_persistent_param_in_dit", None
+            )
         )
+        _pipe, _fantasytalking, _wav2vec_processor, _wav2vec = load_models(args)
         self.pipe = _pipe
         self.fantasytalking = _fantasytalking
         self.want2vec_processor = _wav2vec_processor
@@ -86,21 +114,19 @@ class Predictor(BasePredictor):
         audio_filename = self.filename_with_extension(audio, "audio")
         self.handle_input_file(audio, audio_filename)
 
-        args = {
-            "output_dir": OUTPUT_DIR,
-            "audio_path": os.path.join(INPUT_DIR, audio_filename),
-            "image_path": os.path.join(INPUT_DIR, image_filename),
-            "prompt": prompt,
-            "output_dir": OUTPUT_DIR,
-            "image_size": image_size,
-            "audio_scale": audio_scale,
-            "prompt_cfg_scale": prompt_cfg_scale,
-            "audio_cfg_scale": audio_cfg_scale,
-            "max_num_frames": max_num_frames,
-            "fps": fps,
-            "num_persistent_param_in_dit": num_persistent_param_in_dit,
-            "seed": seed,
-        }
+        args = Arguments(
+            image=image_filename,
+            audio=audio_filename,
+            prompt=prompt,
+            image_size=image_size,
+            audio_scale=audio_scale,
+            prompt_cfg_scale=prompt_cfg_scale,
+            audio_cfg_scale=audio_cfg_scale,
+            max_num_frames=max_num_frames,
+            fps=fps,
+            num_persistent_param_in_dit=num_persistent_param_in_dit,
+            seed=seed,
+        )
 
         output = main(
             args, self.pipe, self.fantasytalking, self.wav2vec_processor, self.wav2vec
