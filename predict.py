@@ -48,9 +48,7 @@ class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory to make running multiple predictions efficient"""
         args = Arguments(
-            num_persistent_param_in_dit=getattr(
-                self, "num_persistent_param_in_dit", None
-            )
+            num_persistent_param_in_dit=getattr(self, "num_persistent_param_in_dit", 0)
         )
         _pipe, _fantasytalking, _wav2vec_processor, _wav2vec = load_models(args)
         self.pipe = _pipe
@@ -93,8 +91,8 @@ class Predictor(BasePredictor):
             default=23,
         ),
         num_persistent_param_in_dit: int = Input(
-            description="Maximum parameter quantity retained in video memory, small number to reduce VRAM required",
-            default=None,
+            description="Maximum parameter quantity retained in video memory, small number to reduce VRAM required, default to 0, set it to None to make it unlimited",
+            default=0,
         ),
         seed: int = Input(description="Random seed", default=1111),
     ) -> Path:
