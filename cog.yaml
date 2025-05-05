@@ -22,5 +22,5 @@ build:
 
   run:
     # optional
-    - pip install flash-attn
+    # - pip install flash-attn
 predict: "predict.py:Predictor"
