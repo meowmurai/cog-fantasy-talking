@@ -19,8 +19,8 @@ build:
     - modelscope
     - ftfy
     - librosa
-    # optional
-    - flash-attn
 
   run:
+    # optional
+    - pip install flash-attn
 predict: "predict.py:Predictor"
