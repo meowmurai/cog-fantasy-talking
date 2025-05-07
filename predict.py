@@ -50,8 +50,16 @@ class Predictor(BasePredictor):
         args = Arguments(
             num_persistent_param_in_dit=getattr(self, "num_persistent_param_in_dit", 0)
         )
-        pipe, fantasytalking, wav2vec_processor, wav2vec = load_models(args)
-        print("Returned models: ", pipe, fantasytalking, wav2vec_processor, wav2vec)
+        models = load_models(args)
+        pipe, fantasytalking, wav2vec_processor, wav2vec = models
+        print(
+            "Returned models: ",
+            models,
+            pipe,
+            fantasytalking,
+            wav2vec_processor,
+            wav2vec,
+        )
         self.pipe = pipe
         self.fantasytalking = fantasytalking
         self.wav2vec_processor = wav2vec_processor
