@@ -53,7 +53,7 @@ class Predictor(BasePredictor):
         _pipe, _fantasytalking, _wav2vec_processor, _wav2vec = load_models(args)
         self.pipe = _pipe
         self.fantasytalking = _fantasytalking
-        self.want2vec_processor = _wav2vec_processor
+        self.wav2vec_processor = _wav2vec_processor
         self.wav2vec = _wav2vec
 
     def filename_with_extension(self, input_file, prefix):
@@ -101,11 +101,14 @@ class Predictor(BasePredictor):
                 shutil.rmtree(directory)
             os.makedirs(directory)
 
-        """Run a single prediction on the model"""
-        if num_persistent_param_in_dit != None:
+        previous_num_persistent_param_in_dit = getattr(
+            self, "num_persistent_param_in_dit", 0
+        )
+        if num_persistent_param_in_dit != previous_num_persistent_param_in_dit:
             self.num_persistent_param_in_dit = num_persistent_param_in_dit
             self.setup()
 
+        """Run a single prediction on the model"""
         image_filename = self.filename_with_extension(image, "image")
         self.handle_input_file(image, image_filename)
 
@@ -113,8 +116,8 @@ class Predictor(BasePredictor):
         self.handle_input_file(audio, audio_filename)
 
         args = Arguments(
-            image=image_filename,
-            audio=audio_filename,
+            image=os.path.join(INPUT_DIR, image_filename),
+            audio=os.path.join(INPUT_DIR, audio_filename),
             prompt=prompt,
             image_size=image_size,
             audio_scale=audio_scale,
