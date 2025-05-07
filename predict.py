@@ -53,24 +53,13 @@ class Predictor(BasePredictor):
         models = load_models(args)
         pipe, fantasytalking, wav2vec_processor, wav2vec = models
         print(
-            "Returned models: ",
-            models,
-            pipe,
-            fantasytalking,
+            "wav2vec_processor: ",
             wav2vec_processor,
-            wav2vec,
         )
         self.pipe = pipe
         self.fantasytalking = fantasytalking
         self.wav2vec_processor = wav2vec_processor
         self.wav2vec = wav2vec
-        print(
-            "Models loaded successfully, saved models: ",
-            self.pipe,
-            self.fantasytalking,
-            self.wav2vec_processor,
-            self.wav2vec,
-        )
 
     def filename_with_extension(self, input_file, prefix):
         extension = os.path.splitext(input_file.name)[1]
@@ -145,13 +134,6 @@ class Predictor(BasePredictor):
             seed=seed,
         )
 
-        print(
-            "Saved models: ",
-            self.pipe,
-            self.fantasytalking,
-            self.wav2vec_processor,
-            self.wav2vec,
-        )
         output = main(
             args, self.pipe, self.fantasytalking, self.wav2vec_processor, self.wav2vec
         )
