@@ -120,6 +120,9 @@ class Predictor(BasePredictor):
         audio_filename = self.filename_with_extension(audio, "audio")
         self.handle_input_file(audio, audio_filename)
 
+        print("input folder: ", os.listdir(INPUT_DIR))
+        print("file names: ", image_filename, audio_filename)
+
         args = Arguments(
             image=os.path.join(INPUT_DIR, image_filename),
             audio=os.path.join(INPUT_DIR, audio_filename),
@@ -134,7 +137,45 @@ class Predictor(BasePredictor):
             seed=seed,
         )
 
-        output = main(
-            args, self.pipe, self.fantasytalking, self.wav2vec_processor, self.wav2vec
+        args2 = Arguments(
+            image=image_filename,
+            audio=audio_filename,
+            prompt=prompt,
+            image_size=image_size,
+            audio_scale=audio_scale,
+            prompt_cfg_scale=prompt_cfg_scale,
+            audio_cfg_scale=audio_cfg_scale,
+            max_num_frames=max_num_frames,
+            fps=fps,
+            num_persistent_param_in_dit=num_persistent_param_in_dit,
+            seed=seed,
         )
-        return Path(output)
+
+        output1 = ""
+        output2 = ""
+        try:
+            output1 = main(
+                args,
+                self.pipe,
+                self.fantasytalking,
+                self.wav2vec_processor,
+                self.wav2vec,
+            )
+        except Exception as e:
+            print("output1 failed: ", e)
+
+        try:
+            output2 = main(
+                args2,
+                self.pipe,
+                self.fantasytalking,
+                self.wav2vec_processor,
+                self.wav2vec,
+            )
+        except Exception as e:
+            print("output2 failed: ", e)
+
+        print("output folder: ", os.listdir(OUTPUT_DIR))
+        print("output1: ", output1)
+        print("output2: ", output2)
+        return Path(output1 or output2)
