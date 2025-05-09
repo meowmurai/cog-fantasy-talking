@@ -52,10 +52,7 @@ class Predictor(BasePredictor):
         )
         models = load_models(args)
         pipe, fantasytalking, wav2vec_processor, wav2vec = models
-        print(
-            "wav2vec_processor: ",
-            wav2vec_processor,
-        )
+
         self.pipe = pipe
         self.fantasytalking = fantasytalking
         self.wav2vec_processor = wav2vec_processor
@@ -137,73 +134,13 @@ class Predictor(BasePredictor):
             seed=seed,
         )
 
-        args2 = Arguments(
-            image=image_filename,
-            audio=audio_filename,
-            prompt=prompt,
-            image_size=image_size,
-            audio_scale=audio_scale,
-            prompt_cfg_scale=prompt_cfg_scale,
-            audio_cfg_scale=audio_cfg_scale,
-            max_num_frames=max_num_frames,
-            fps=fps,
-            num_persistent_param_in_dit=num_persistent_param_in_dit,
-            seed=seed,
+        output = main(
+            args,
+            self.pipe,
+            self.fantasytalking,
+            self.wav2vec_processor,
+            self.wav2vec,
         )
-
-        args3 = Arguments(
-            image="./assets/images/woman.png",
-            audio="./assets/audios/woman.wav",
-            prompt=prompt,
-            image_size=image_size,
-            audio_scale=audio_scale,
-            prompt_cfg_scale=prompt_cfg_scale,
-            audio_cfg_scale=audio_cfg_scale,
-            max_num_frames=max_num_frames,
-            fps=fps,
-            num_persistent_param_in_dit=num_persistent_param_in_dit,
-            seed=seed,
-        )
-
-        output1 = ""
-        output2 = ""
-        output3 = ""
-
-        try:
-            output1 = main(
-                args,
-                self.pipe,
-                self.fantasytalking,
-                self.wav2vec_processor,
-                self.wav2vec,
-            )
-        except Exception as e:
-            print("output1 failed: ", e)
-
-        try:
-            output2 = main(
-                args2,
-                self.pipe,
-                self.fantasytalking,
-                self.wav2vec_processor,
-                self.wav2vec,
-            )
-        except Exception as e:
-            print("output2 failed: ", e)
-
-        try:
-            output3 = main(
-                args3,
-                self.pipe,
-                self.fantasytalking,
-                self.wav2vec_processor,
-                self.wav2vec,
-            )
-        except Exception as e:
-            print("output3 failed: ", e)
 
         print("output folder: ", os.listdir(OUTPUT_DIR))
-        print("output1: ", output1)
-        print("output2: ", output2)
-        print("output3: ", output3)
-        return Path(output1 or output2 or output3)
+        return Path(output)
